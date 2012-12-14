@@ -1,0 +1,26 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      #myCanvas { 
+        border: 1px solid black;
+        background: black
+      }
+    </style>
+    <script>
+      zeichneFeld(context) {
+
+      }
+      window.onload = function(){
+        canvas = document.getElementById("myCanvas");
+        context = canvas.getContext("2d");
+        context.font = "normal 40px Courier New";
+        zeichneFeld(context);
+      };
+    </script>
+  </head>
+  <body onmousedown="return false;">
+    <canvas id="myCanvas" width="800" height="600">
+    </canvas>
+  </body>
+</html>
