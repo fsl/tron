@@ -1,8 +1,6 @@
 var context;
 var spielfeldbreite = 50;
 var spielfeldhoehe = 50;
-var spieler1;
-var spieler2;
 var raster = 10;
 
 function erstelleSpielfeld(breite, hoehe) {
@@ -33,7 +31,18 @@ function rechteck(x, y, breite, hoehe, farbe, context) {
 function zeichneFeld(spielfeld, spielers, context) {
   for (var x = 0; x<spielfeld.length; x++) {
     for (var y = 0; y<spielfeld[x].length; y++) {
-      kreis(x*raster, y*raster, 1, 'white', context); 
+      if (spielfeld[x][y] > 0) {
+        rechteck(
+          raster * (x-1/2),
+          raster * (y-1/2), 
+          raster, 
+          raster, 
+          'white',
+          context
+        );
+      } else {
+        kreis(x*raster, y*raster, 1, 'white', context); 
+      }
     }
   }
 
@@ -53,17 +62,52 @@ function erstelleSpieler(breite, hoehe)
 {
   return [
   {
+    id: 1,
     x: 10,
     y: hoehe/2,
     richtung: 3,
-    farbe: 'blue'
+    farbe: 'red'
   }, {
+    id: 2,
     x: breite-10,
     y: hoehe/2,
     richtung: 9,
-    farbe: 'purple'
+    farbe: 'yellow'
   }
   ]
+}
+
+function versetzeSpieler(spielers) {
+  spielers.forEach(function (spieler) { 
+    switch(spieler.richtung) {
+      case 3:
+        spieler.x++;
+        break;
+      case 6:
+        spieler.y++;
+        break;
+      case 9:
+        spieler.x--;
+        break;
+      case 12:
+        spieler.y--;
+    }
+  });
+}
+
+function markiereFeld(spielfeld, spielers) {
+  spielers.forEach(function (spieler) { 
+    spielfeld[spieler.x][spieler.y] = spieler.id;
+  });
+}
+
+function schritt(spielfeld, spieler, context) {
+  markiereFeld(spielfeld, spieler);
+  versetzeSpieler(spieler);
+  zeichneFeld(spielfeld, spieler, context);
+  setTimeout(function() {
+    schritt(spielfeld, spieler, context);
+  }, 30);
 }
 
 window.onload = function(){
@@ -72,7 +116,6 @@ window.onload = function(){
   context.font = "normal 40px Courier New";
   var spielfeld = erstelleSpielfeld(spielfeldbreite, spielfeldhoehe);
   var spieler = erstelleSpieler(spielfeldbreite, spielfeldhoehe);
-  zeichneFeld(spielfeld, spieler, context);
-
+  schritt(spielfeld, spieler, context);
 };
 
