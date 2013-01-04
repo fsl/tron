@@ -118,4 +118,3 @@ window.onload = function(){
   var spieler = erstelleSpieler(spielfeldbreite, spielfeldhoehe);
   schritt(spielfeld, spieler, context);
 };
-
