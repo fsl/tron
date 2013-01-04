@@ -110,10 +110,20 @@ function kollisionWand(spielers, spielfeld) {
   });
 }
 
+function kollisionSpur(spielers, spielfeld) {
+  spielers.forEach(function (spieler) {
+    if (spielfeld[spieler.x][spieler.y] > 0) { 
+       alert('Spieler ' + spieler.id + ' hat verloren');
+    } 
+  });
+}
+
+
 function schritt(spielfeld, spieler, context) {
   markiereFeld(spielfeld, spieler);
   versetzeSpieler(spieler);
   kollisionWand(spieler, spielfeld);
+  kollisionSpur(spieler, spielfeld);
   zeichneFeld(spielfeld, spieler, context);
   setTimeout(function() {
     schritt(spielfeld, spieler, context);
