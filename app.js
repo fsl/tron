@@ -29,15 +29,21 @@ function rechteck(x, y, breite, hoehe, farbe, context) {
 }
 
 function zeichneFeld(spielfeld, spielers, context) {
-  for (var x = 0; x<spielfeld.length; x++) {
-    for (var y = 0; y<spielfeld[x].length; y++) {
+  for (var x = 1; x<spielfeld.length; x++) {
+    for (var y = 1; y<spielfeld[x].length; y++) {
+      var farbe = 'green'
+      spielers.forEach(function (spieler) {
+        if (spielfeld[x][y] == spieler.id) {
+          farbe = spieler.spur;
+        }
+      })      
       if (spielfeld[x][y] > 0) {
         rechteck(
             raster * (x-1/2),
             raster * (y-1/2), 
             raster, 
             raster, 
-            'white',
+            farbe,
             context
             );
       } else {
@@ -68,13 +74,15 @@ function erstelleSpieler(breite, hoehe)
     x: 10,
     y: hoehe/2,
     richtung: 3,
-    farbe: 'red'
+    farbe: 'red',
+    spur: 'maroon'
   }, {
     id: 2,
     x: breite-10,
     y: hoehe/2,
     richtung: 9,
-    farbe: 'yellow'
+    farbe: 'yellow',
+    spur: 'olive'
   }
   ]
 }
@@ -110,7 +118,6 @@ function kollisionWand(spielers, spielfeld) {
     if (spieler.richtung > 0) {
       if (spieler.x <= 0 || spieler.x >= spielfeld[0].length
         || spieler.y <= 0 || spieler.y >= spielfeld.length) { 
-          alert('Spieler ' + spieler.id + ' hat verloren');
           deaktiviereSpieler(spieler);
         } 
     }
@@ -121,7 +128,6 @@ function kollisionSpur(spielers, spielfeld) {
   spielers.forEach(function (spieler) {
     if (spieler.richtung > 0) {
       if (spielfeld[spieler.x][spieler.y] > 0) { 
-        alert('Spieler ' + spieler.id + ' hat verloren');
         deaktiviereSpieler(spieler);
       }
     } 
@@ -151,14 +157,16 @@ function schritt(spielfeld, spieler, context) {
   kollisionSpur(spieler, spielfeld);
   if (lebendigeSpieler(spieler) == 1) {
     alert('Gewonnen');
+    location.reload()
   }
   if (lebendigeSpieler(spieler) == 0) {
     alert('Unentschieden');
+    location.reload()
   }
   zeichneFeld(spielfeld, spieler, context);
   setTimeout(function() {
     schritt(spielfeld, spieler, context);
-  }, 50);
+  }, 50)
 }
 
 function initBedienung(spieler) {
