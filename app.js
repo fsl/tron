@@ -101,13 +101,23 @@ function markiereFeld(spielfeld, spielers) {
   });
 }
 
+function kollisionWand(spielers, spielfeld) {
+  spielers.forEach(function (spieler) {
+    if (spieler.x <= 0 || spieler.x >= spielfeld[0].length
+     || spieler.y <= 0 || spieler.y >= spielfeld.length) { 
+       alert('Spieler ' + spieler.id + ' hat verloren');
+    } 
+  });
+}
+
 function schritt(spielfeld, spieler, context) {
   markiereFeld(spielfeld, spieler);
   versetzeSpieler(spieler);
+  kollisionWand(spieler, spielfeld);
   zeichneFeld(spielfeld, spieler, context);
   setTimeout(function() {
     schritt(spielfeld, spieler, context);
-  }, 30);
+  }, 50);
 }
 
 function initBedienung(spieler) {
