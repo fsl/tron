@@ -33,13 +33,13 @@ function zeichneFeld(spielfeld, spielers, context) {
     for (var y = 0; y<spielfeld[x].length; y++) {
       if (spielfeld[x][y] > 0) {
         rechteck(
-          raster * (x-1/2),
-          raster * (y-1/2), 
-          raster, 
-          raster, 
-          'white',
-          context
-        );
+            raster * (x-1/2),
+            raster * (y-1/2), 
+            raster, 
+            raster, 
+            'white',
+            context
+            );
       } else {
         kreis(x*raster, y*raster, 1, 'white', context); 
       }
@@ -54,7 +54,7 @@ function zeichneFeld(spielfeld, spielers, context) {
       raster, 
       spieler.farbe, 
       context
-    );
+      );
   });
 }
 
@@ -110,6 +110,22 @@ function schritt(spielfeld, spieler, context) {
   }, 30);
 }
 
+function initBedienung(spieler) {
+  document.onkeydown = function(e) {
+    e = e || window.event;
+    switch(e.keyCode) {
+      case 65: spieler[0].richtung = 9;  break;
+      case 87: spieler[0].richtung = 12; break;
+      case 68: spieler[0].richtung = 3;  break;
+      case 83: spieler[0].richtung = 6;  break;
+      case 37: spieler[1].richtung = 9;  break;
+      case 38: spieler[1].richtung = 12; break;
+      case 39: spieler[1].richtung = 3;  break;
+      case 40: spieler[1].richtung = 6;  break;
+    }
+  }
+}
+
 window.onload = function(){
   canvas = document.getElementById("myCanvas");
   context = canvas.getContext("2d");
@@ -117,4 +133,5 @@ window.onload = function(){
   var spielfeld = erstelleSpielfeld(spielfeldbreite, spielfeldhoehe);
   var spieler = erstelleSpieler(spielfeldbreite, spielfeldhoehe);
   schritt(spielfeld, spieler, context);
+  initBedienung(spieler);
 };
