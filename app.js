@@ -47,14 +47,16 @@ function zeichneFeld(spielfeld, spielers, context) {
   }
 
   spielers.forEach(function (spieler) {
-    rechteck(
-      raster * (spieler.x-1/2),
-      raster * (spieler.y-1/2), 
-      raster, 
-      raster, 
-      spieler.farbe, 
-      context
-      );
+    if (spieler.richtung > 0) {
+      rechteck(
+        raster * (spieler.x-1/2),
+        raster * (spieler.y-1/2), 
+        raster, 
+        raster, 
+        spieler.farbe, 
+        context
+        );
+    }
   });
 }
 
@@ -97,33 +99,62 @@ function versetzeSpieler(spielers) {
 
 function markiereFeld(spielfeld, spielers) {
   spielers.forEach(function (spieler) { 
-    spielfeld[spieler.x][spieler.y] = spieler.id;
+    if (spieler.richtung > 0) {
+      spielfeld[spieler.x][spieler.y] = spieler.id;
+    }
   });
 }
 
 function kollisionWand(spielers, spielfeld) {
   spielers.forEach(function (spieler) {
-    if (spieler.x <= 0 || spieler.x >= spielfeld[0].length
-     || spieler.y <= 0 || spieler.y >= spielfeld.length) { 
-       alert('Spieler ' + spieler.id + ' hat verloren');
-    } 
+    if (spieler.richtung > 0) {
+      if (spieler.x <= 0 || spieler.x >= spielfeld[0].length
+        || spieler.y <= 0 || spieler.y >= spielfeld.length) { 
+          alert('Spieler ' + spieler.id + ' hat verloren');
+          deaktiviereSpieler(spieler);
+        } 
+    }
   });
 }
 
 function kollisionSpur(spielers, spielfeld) {
   spielers.forEach(function (spieler) {
-    if (spielfeld[spieler.x][spieler.y] > 0) { 
-       alert('Spieler ' + spieler.id + ' hat verloren');
+    if (spieler.richtung > 0) {
+      if (spielfeld[spieler.x][spieler.y] > 0) { 
+        alert('Spieler ' + spieler.id + ' hat verloren');
+        deaktiviereSpieler(spieler);
+      }
     } 
   });
 }
 
+function lebendigeSpieler(spielers) {
+  var lebendigeSpieler = 0;
+  spielers.forEach(function (spieler) {
+    if (spieler.richtung > 0) {
+      lebendigeSpieler++
+    }
+  });
+  return lebendigeSpieler;
+}
+
+function deaktiviereSpieler(spieler) {
+  spieler.x = -10;
+  spieler.y = -10;
+  spieler.richtung = 0;
+}
 
 function schritt(spielfeld, spieler, context) {
   markiereFeld(spielfeld, spieler);
   versetzeSpieler(spieler);
   kollisionWand(spieler, spielfeld);
   kollisionSpur(spieler, spielfeld);
+  if (lebendigeSpieler(spieler) == 1) {
+    alert('Gewonnen');
+  }
+  if (lebendigeSpieler(spieler) == 0) {
+    alert('Unentschieden');
+  }
   zeichneFeld(spielfeld, spieler, context);
   setTimeout(function() {
     schritt(spielfeld, spieler, context);
