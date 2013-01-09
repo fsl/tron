@@ -2,6 +2,7 @@ var context;
 var spielfeldbreite = 50;
 var spielfeldhoehe = 50;
 var raster = 10;
+var lebendigeSpielerID = 0
 
 function erstelleSpielfeld(breite, hoehe) {
   var spielfeld = [];
@@ -139,6 +140,7 @@ function lebendigeSpieler(spielers) {
   spielers.forEach(function (spieler) {
     if (spieler.richtung > 0) {
       lebendigeSpieler++
+      lebendigeSpielerID = spieler.id
     }
   });
   return lebendigeSpieler;
@@ -156,7 +158,7 @@ function schritt(spielfeld, spieler, context) {
   kollisionWand(spieler, spielfeld);
   kollisionSpur(spieler, spielfeld);
   if (lebendigeSpieler(spieler) == 1) {
-    alert('Gewonnen');
+    alert('Spieler ' + lebendigeSpielerID + ' hat gewonnen');
     location.reload()
   }
   if (lebendigeSpieler(spieler) == 0) {
