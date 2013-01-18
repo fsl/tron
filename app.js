@@ -1,6 +1,6 @@
 var context;
-var spielfeldbreite = 50;
-var spielfeldhoehe = 50;
+var spielfeldbreite = 100;
+var spielfeldhoehe = 60;
 var raster = 10;
 var lebendigeSpielerID = 0
 
@@ -29,7 +29,7 @@ function rechteck(x, y, breite, hoehe, farbe, context) {
   context.fill();
 }
 
-function zeichneFeld(spielfeld, spielers, context) {
+function zeichneFeld(spielfeld, spielers, context, neuzeichnen) {
   for (var x = 1; x<spielfeld.length; x++) {
     for (var y = 1; y<spielfeld[x].length; y++) {
       var farbe = 'green'
@@ -48,7 +48,17 @@ function zeichneFeld(spielfeld, spielers, context) {
             context
             );
       } else {
-        kreis(x*raster, y*raster, 1, 'white', context); 
+        if (neuzeichnen) {
+          rechteck(
+              raster * (x-1/2),
+              raster * (y-1/2), 
+              raster, 
+              raster, 
+              'black',
+              context
+              );
+          kreis(x*raster, y*raster, 1, 'white', context); 
+        }
       }
     }
   }
@@ -67,25 +77,38 @@ function zeichneFeld(spielfeld, spielers, context) {
   });
 }
 
+function reseteSpieler(spielers, breite, hoehe)
+{
+  var spielerZaehler = 0;
+  var xPositionen = [10, breite - 10, breite /2, breite /2];
+  var yPositionen = [hoehe / 2 , hoehe / 2, 10, hoehe - 10];
+  var richtungen = [3, 9, 6, 12];
+
+  spielers.forEach(function (spieler) {
+    spieler.x = xPositionen[spielerZaehler];
+    spieler.y = yPositionen[spielerZaehler];
+    spieler.richtung = richtungen[spielerZaehler];
+    console.log(spieler);
+    spielerZaehler++;
+  });
+  return spielers;
+}
+
 function erstelleSpieler(breite, hoehe)
 {
-  return [
+  return reseteSpieler([
   {
     id: 1,
-    x: 10,
-    y: hoehe/2,
-    richtung: 3,
     farbe: 'red',
-    spur: 'maroon'
+    spur: 'maroon',
+    punkte: 0
   }, {
     id: 2,
-    x: breite-10,
-    y: hoehe/2,
-    richtung: 9,
     farbe: 'yellow',
-    spur: 'olive'
+    spur: 'olive',
+    punkte: 0
   }
-  ]
+  ], breite, hoehe);
 }
 
 function versetzeSpieler(spielers) {
@@ -117,8 +140,8 @@ function markiereFeld(spielfeld, spielers) {
 function kollisionWand(spielers, spielfeld) {
   spielers.forEach(function (spieler) {
     if (spieler.richtung > 0) {
-      if (spieler.x <= 0 || spieler.x >= spielfeld[0].length
-        || spieler.y <= 0 || spieler.y >= spielfeld.length) { 
+      if (spieler.x <= 0 || spieler.x >= spielfeld.length
+        || spieler.y <= 0 || spieler.y >= spielfeld[0].length) { 
           deaktiviereSpieler(spieler);
         } 
     }
@@ -152,18 +175,26 @@ function deaktiviereSpieler(spieler) {
   spieler.richtung = 0;
 }
 
+function reseteSpiel(spielfeld, spieler) {
+  for(var x = 0; x<spielfeld.length; x++) {
+    for(var y = 0; y<spielfeld[x].length; y++) {
+      spielfeld[x][y] = 0;     
+    }
+  }
+  reseteSpieler(spieler, spielfeld.length, spielfeld[0].length);
+  zeichneFeld(spielfeld, spieler, context, true);
+}
+
 function schritt(spielfeld, spieler, context) {
   markiereFeld(spielfeld, spieler);
   versetzeSpieler(spieler);
   kollisionWand(spieler, spielfeld);
   kollisionSpur(spieler, spielfeld);
   if (lebendigeSpieler(spieler) == 1) {
-    alert('Spieler ' + lebendigeSpielerID + ' hat gewonnen');
-    location.reload()
+    reseteSpiel(spielfeld, spieler);
   }
   if (lebendigeSpieler(spieler) == 0) {
-    alert('Unentschieden');
-    location.reload()
+    reseteSpiel(spielfeld, spieler);
   }
   zeichneFeld(spielfeld, spieler, context);
   setTimeout(function() {
@@ -193,6 +224,7 @@ window.onload = function(){
   context.font = "normal 40px Courier New";
   var spielfeld = erstelleSpielfeld(spielfeldbreite, spielfeldhoehe);
   var spieler = erstelleSpieler(spielfeldbreite, spielfeldhoehe);
+  zeichneFeld(spielfeld, spieler, context, true);
   schritt(spielfeld, spieler, context);
   initBedienung(spieler);
 };
