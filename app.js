@@ -30,6 +30,9 @@ function rechteck(x, y, breite, hoehe, farbe, context) {
 }
 
 function zeichneFeld(spielfeld, spielers, context, neuzeichnen) {
+  if (neuzeichnen) {
+    rechteck(1000, 0, 2, 600,'white', context )
+    }
   for (var x = 1; x<spielfeld.length; x++) {
     for (var y = 1; y<spielfeld[x].length; y++) {
       var farbe = 'green'
@@ -183,7 +186,22 @@ function reseteSpiel(spielfeld, spieler) {
   }
   reseteSpieler(spieler, spielfeld.length, spielfeld[0].length);
   zeichneFeld(spielfeld, spieler, context, true);
+  zeichnePunkte(spieler,context);
 }
+
+function zeichnePunkte(spieler,context) {
+  var positionZaehler = 0;
+  var yPositionen = [20, 120, 220, 420]
+  context.font = "normal 48px Courier New";
+  spieler.forEach(function (spieler) {
+    rechteck(1010, yPositionen[positionZaehler],190,100,'black',context)
+    context.fillStyle = spieler.farbe;
+    context.fillText(spieler.punkte, 1010, yPositionen[positionZaehler]+48);
+    positionZaehler++;
+  })
+}
+   
+  
 
 function schritt(spielfeld, spieler, context) {
   markiereFeld(spielfeld, spieler);
@@ -191,9 +209,16 @@ function schritt(spielfeld, spieler, context) {
   kollisionWand(spieler, spielfeld);
   kollisionSpur(spieler, spielfeld);
   if (lebendigeSpieler(spieler) == 1) {
+    alert('Spieler ' + lebendigeSpielerID + ' hat gewonnen');
+    spieler.forEach(function (spieler) {
+      if (spieler.id == lebendigeSpielerID) {
+        spieler.punkte++
+      }
+    })
     reseteSpiel(spielfeld, spieler);
   }
   if (lebendigeSpieler(spieler) == 0) {
+    alert('Unentschieden')
     reseteSpiel(spielfeld, spieler);
   }
   zeichneFeld(spielfeld, spieler, context);
@@ -225,6 +250,7 @@ window.onload = function(){
   var spielfeld = erstelleSpielfeld(spielfeldbreite, spielfeldhoehe);
   var spieler = erstelleSpieler(spielfeldbreite, spielfeldhoehe);
   zeichneFeld(spielfeld, spieler, context, true);
+  zeichnePunkte(spieler,context)
   schritt(spielfeld, spieler, context);
   initBedienung(spieler);
 };
