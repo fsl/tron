@@ -2,7 +2,8 @@ var context;
 var spielfeldbreite = 100;
 var spielfeldhoehe = 60;
 var raster = 10;
-var lebendigeSpielerID = 0
+var lebendigeSpielerID = 0;
+var punkteVeraenderungZaehler = 0;
 
 function erstelleSpielfeld(breite, hoehe) {
   var spielfeld = [];
@@ -186,15 +187,19 @@ function reseteSpiel(spielfeld, spieler) {
   }
   reseteSpieler(spieler, spielfeld.length, spielfeld[0].length);
   zeichneFeld(spielfeld, spieler, context, true);
-  zeichnePunkte(spieler,context);
+  zeichnePunkte(spieler,context,true);
 }
 
-function zeichnePunkte(spieler,context) {
+function zeichnePunkte(spieler,context,punkteVeraenderung) {
   var positionZaehler = 0;
-  var yPositionen = [20, 120, 220, 420]
-  context.font = "normal 48px Courier New";
+  var yPositionen = [20, 120, 220, 420] 
   spieler.forEach(function (spieler) {
     rechteck(1010, yPositionen[positionZaehler],190,100,'black',context)
+    if (punkteVeraenderung && spieler.id == lebendigeSpielerID) { 
+      context.font = "normal 52px Courier New";
+    } else {
+      context.font = "normal 48px Courier New";
+    }
     context.fillStyle = spieler.farbe;
     context.fillText(spieler.punkte, 1010, yPositionen[positionZaehler]+48);
     positionZaehler++;
@@ -204,21 +209,27 @@ function zeichnePunkte(spieler,context) {
   
 
 function schritt(spielfeld, spieler, context) {
+if (punkteVeraenderungZaehler == 0) {
+  zeichnePunkte(spieler,context);
+}
+else if (punkteVeraenderungZaehler >= -1) {
+  punkteVeraenderungZaehler--;
+}
   markiereFeld(spielfeld, spieler);
   versetzeSpieler(spieler);
   kollisionWand(spieler, spielfeld);
   kollisionSpur(spieler, spielfeld);
   if (lebendigeSpieler(spieler) == 1) {
-    alert('Spieler ' + lebendigeSpielerID + ' hat gewonnen');
     spieler.forEach(function (spieler) {
       if (spieler.id == lebendigeSpielerID) {
         spieler.punkte++
+        punkteVeraenderungZaehler = 2;
       }
     })
     reseteSpiel(spielfeld, spieler);
   }
   if (lebendigeSpieler(spieler) == 0) {
-    alert('Unentschieden')
+    lebendigeSpielerID = 0;
     reseteSpiel(spielfeld, spieler);
   }
   zeichneFeld(spielfeld, spieler, context);
